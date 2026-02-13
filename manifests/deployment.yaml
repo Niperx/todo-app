@@ -14,4 +14,6 @@ spec:
     spec:
       containers:
         - name: todo
-          image: niperx/todo-app
+          image: niperx/todo-app:latest
+          ports:
+            - containerPort: 5000
