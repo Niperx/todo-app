@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: todo-ingress
+  namespace: default
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure          # только HTTPS
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt   # имя резолвера из HelmChartConfig
+    # Опционально: если хочешь HTTP → HTTPS редирект (если включишь в HelmChartConfig)
+    # traefik.ingress.kubernetes.io/router.middlewares: default-redirecthttps@kubernetescrd
+spec:
+  ingressClassName: traefik     # на всякий случай явно указываем (в k3s по умолчанию traefik)
+  tls:
+  - hosts:
+    - wtfapepe.ru
+    secretName: wtfapepe-ru-tls   # Traefik сам создаст этот secret с сертификатом
+  rules:
+  - host: wtfapepe.ru
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: todo-app-service
+            port:
+              number: 80          # порт сервиса (который ты указал в Service)
